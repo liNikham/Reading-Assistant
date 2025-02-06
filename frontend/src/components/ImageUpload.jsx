@@ -27,6 +27,7 @@ const ImageUpload = ({ setFile: setParentFile, setCoordinates }) => {
           body: formData,
         });
 
+        
         const data = await response.json();
         if (data.success) {
           setCoordinates(data.data);
