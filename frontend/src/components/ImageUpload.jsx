@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiUploadCloud, FiImage, FiSearch } from 'react-icons/fi';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+
 const ImageUpload = ({ setFile: setParentFile, setCoordinates }) => {
   const [localFile, setLocalFile] = useState(null);
   const [extractedWords, setExtractedWords] = useState([]);
@@ -20,7 +22,7 @@ const ImageUpload = ({ setFile: setParentFile, setCoordinates }) => {
         const formData = new FormData();
         formData.append('image', selectedFile);
 
-        const response = await fetch('http://localhost:5000/api/ocr/process', {
+        const response = await fetch(`${API_URL}/api/ocr`, {
           method: 'POST',
           body: formData,
         });
