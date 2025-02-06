@@ -30,6 +30,11 @@ ENV PATH="/opt/venv/bin:$PATH"
 COPY requirements.txt .
 RUN . /opt/venv/bin/activate && pip3 install --no-cache-dir -r requirements.txt
 
+# Pre-download EasyOCR models
+RUN mkdir -p /root/.EasyOCR/model
+COPY download_models.py .
+RUN python3 download_models.py
+
 # Create uploads directory
 RUN mkdir -p uploads
 
