@@ -5,7 +5,7 @@ class OCRService {
   async performOCR(imagePath) {
     return new Promise((resolve, reject) => {
       const pythonScriptPath = path.join(__dirname, 'ocr_service.py');
-      const pythonProcess = spawn('python', [pythonScriptPath, imagePath]);
+      const pythonProcess = spawn('python3', ['src/services/ocr_service.py', imagePath]);
       
       let outputData = '';
 

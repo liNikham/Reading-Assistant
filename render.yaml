@@ -3,13 +3,18 @@ services:
   - type: web
     name: ocr-backend
     env: node
-    buildCommand: cd backend && npm install
+    buildCommand: |
+      apt-get update && apt-get install -y python3-pip
+      cd backend && npm install
+      pip3 install -r requirements.txt
     startCommand: cd backend && npm start
     envVars:
       - key: NODE_ENV
         value: production
       - key: PORT
         value: 8080
+      - key: PYTHONPATH
+        value: /opt/render/project/src/backend
 
   # Frontend static site
   - type: web
