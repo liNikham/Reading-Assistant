@@ -83,8 +83,21 @@ const ImageUpload = ({ setFile: setParentFile, setCoordinates }) => {
     }
 
     if ('speechSynthesis' in window) {
+      // Cancel any ongoing speech
+      window.speechSynthesis.cancel();
+
       const speech = new SpeechSynthesisUtterance(word);
       speech.lang = 'en-US';
+      
+      // Adjust speech rate (0.1 to 10, 1 is normal speed, lower is slower)
+      speech.rate = 0.5; // You can adjust this value
+      
+      // Adjust pitch (0 to 2, 1 is normal)
+      speech.pitch = 1;
+      
+      // Adjust volume (0 to 1)
+      speech.volume = 1;
+
       window.speechSynthesis.speak(speech);
     } else {
       console.log('Speech synthesis not supported');

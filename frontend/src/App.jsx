@@ -25,7 +25,7 @@ const App = () => {
             animate={{ scale: 1 }}
             className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 text-transparent bg-clip-text mb-4"
           >
-            OCR Word Highlighter
+           Reading Assistant For Kids 
           </motion.h1>
           <motion.p
             initial={{ opacity: 0 }}
@@ -33,7 +33,7 @@ const App = () => {
             transition={{ delay: 0.2 }}
             className="text-gray-600 text-lg md:text-xl"
           >
-            Upload images and detect text with intelligent highlighting
+            Upload your child's book  page and get a reading assistant
           </motion.p>
         </motion.div>
 
