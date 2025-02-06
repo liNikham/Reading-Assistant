@@ -22,7 +22,7 @@ const ImageUpload = ({ setFile: setParentFile, setCoordinates }) => {
         const formData = new FormData();
         formData.append('image', selectedFile);
 
-        const response = await fetch(`${API_URL}/api/ocr`, {
+        const response = await fetch(`${API_URL}/api/ocr/process`, {
           method: 'POST',
           body: formData,
         });
