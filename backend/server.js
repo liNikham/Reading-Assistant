@@ -27,12 +27,17 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-// Middleware
+// Updated CORS configuration
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? 'https://ocr-frontend.onrender.com'
-    : 'http://localhost:3000'
+  origin: [
+    process.env.FRONTEND_URL,
+    'http://localhost:3000',
+    'http://localhost:5173'
+  ],
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
 app.use(express.json());
 
 app.get("/", (req, res) => {
