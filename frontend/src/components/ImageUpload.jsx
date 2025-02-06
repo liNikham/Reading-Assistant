@@ -106,25 +106,36 @@ const ImageUpload = ({ setFile: setParentFile, setCoordinates }) => {
 
   const displayExtractedText = (words) => {
     return words.map((word, index) => (
-      <span
+      <motion.span
         key={index}
         data-word-index={index}
         onClick={() => handleWordClick(word, index)}
-        style={{ cursor: 'pointer', margin: '0 4px' }}
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.95 }}
         className="word"
       >
         {word}
-      </span>
+      </motion.span>
     ));
   };
 
-  // Add this CSS either in your stylesheet or in the component
   const styles = `
+    .word {
+      display: inline-block;
+      margin: 0 4px;
+      padding: 2px 4px;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: all 0.2s ease;
+    }
     .word:hover {
-      text-decoration: underline;
+      color: #6d28d9;
+      background-color: #ede9fe;
     }
     .highlighted {
-      background-color: yellow;
+      color: #6d28d9;
+      background-color: #ddd6fe;
+      font-weight: 500;
     }
   `;
 
