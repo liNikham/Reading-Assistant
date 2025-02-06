@@ -43,6 +43,11 @@ app.get("/", (req, res) => {
   res.send("Backend is running!");
 });
 
+// Add a ping endpoint
+app.get("/ping", (req, res) => {
+  res.send("pong");
+});
+
 // Routes
 const ocrRoutes = require('./src/routes/ocrRoutes');
 app.use('/api/ocr', ocrRoutes);

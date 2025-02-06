@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiUploadCloud, FiImage, FiSearch } from 'react-icons/fi';
 
@@ -10,6 +10,19 @@ const ImageUpload = ({ setFile: setParentFile, setCoordinates }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const warmupServer = async () => {
+      try {
+        const response = await fetch(`${API_URL}/ping`);
+        console.log('Server warmed up:', await response.text());
+      } catch (err) {
+        console.log('Server warming up...');
+      }
+    };
+    
+    warmupServer();
+  }, []);
 
   const handleFile = async (selectedFile) => {
     if (selectedFile && selectedFile.type.startsWith('image/')) {

@@ -2,6 +2,7 @@ const OCRService = require('../services/ocrService');
 const fs = require('fs');
 
 exports.processImage = async (req, res) => {
+   console.log("in process image");
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'No image file provided' });
