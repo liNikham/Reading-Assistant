@@ -1,44 +1,49 @@
-import easyocr
-import json
 import sys
+import json
+import easyocr
+import numpy as np
 from PIL import Image
 
-def perform_ocr(image_path):
+def process_image(image_path):
     try:
-        # Print status messages to stderr instead of stdout
-        sys.stderr.write("Initializing EasyOCR...\n")
-        reader = easyocr.Reader(['en'], verbose=False)  # Set verbose to False to reduce output
+        print("Initializing EasyOCR...", file=sys.stderr)
+        reader = easyocr.Reader(['en'], model_storage_directory='/app/models')
         
-        sys.stderr.write("Processing image...\n")
+        print("Loading image...", file=sys.stderr)
+        image = Image.open(image_path)
+        
+        print("Processing image with OCR...", file=sys.stderr)
         result = reader.readtext(image_path)
         
-        # Format the results
-        words = []
+        # Convert numpy arrays to lists for JSON serialization
+        processed_result = []
         for bbox, text, conf in result:
-            x0 = min(point[0] for point in bbox)
-            y0 = min(point[1] for point in bbox)
-            x1 = max(point[0] for point in bbox)
-            y1 = max(point[1] for point in bbox)
-            
-            words.append({
+            processed_result.append({
+                'bbox': [[float(x) for x in point] for point in bbox],
                 'text': text,
-                'confidence': float(conf),
-                'x0': int(x0),
-                'y0': int(y0),
-                'x1': int(x1),
-                'y1': int(y1)
+                'confidence': float(conf)
             })
         
-        # Only print the JSON result to stdout
-        print(json.dumps({'success': True, 'data': words}))
+        print(json.dumps({
+            'success': True,
+            'data': processed_result
+        }))
         
     except Exception as e:
-        print(json.dumps({'success': False, 'error': str(e)}))
+        print(f"Error processing image: {str(e)}", file=sys.stderr)
+        print(json.dumps({
+            'success': False,
+            'error': str(e)
+        }))
         sys.exit(1)
 
-if __name__ == '__main__':
-    if len(sys.argv) > 1:
-        perform_ocr(sys.argv[1])
-    else:
-        print(json.dumps({'success': False, 'error': 'No image path provided'}))
+if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        print(json.dumps({
+            'success': False,
+            'error': 'Image path not provided'
+        }))
         sys.exit(1)
+        
+    image_path = sys.argv[1]
+    process_image(image_path)

@@ -30,18 +30,18 @@ ENV PATH="/opt/venv/bin:$PATH"
 COPY requirements.txt .
 RUN . /opt/venv/bin/activate && pip3 install --no-cache-dir -r requirements.txt
 
-# Pre-download EasyOCR models
-RUN mkdir -p /root/.EasyOCR/model
-COPY download_models.py .
-RUN python3 download_models.py
+# Create directories and set permissions
+RUN mkdir -p /app/models /app/uploads \
+    && chmod -R 777 /app/models /app/uploads
 
-# Create uploads directory
-RUN mkdir -p uploads
+# Pre-download EasyOCR models
+COPY download_models.py .
+ENV PYTHONPATH=/app/src/services
+RUN python3 download_models.py
 
 # Set environment variables
 ENV NODE_ENV=production
 ENV PORT=8080
-ENV PYTHONPATH=/app/src/services
 ENV PYTHONUNBUFFERED=1
 
 # Expose the port
