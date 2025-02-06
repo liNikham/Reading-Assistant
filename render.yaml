@@ -4,9 +4,23 @@ services:
     name: ocr-backend
     env: node
     buildCommand: |
-      apt-get update && apt-get install -y python3-pip
+      # Install system dependencies with sudo
+      sudo apt-get update && sudo apt-get install -y \
+        python3 \
+        python3-pip \
+        python3-dev \
+        build-essential \
+        libgl1-mesa-glx
+      # Install Node dependencies
       cd backend && npm install
-      pip3 install -r requirements.txt
+      # Install Python dependencies from backend directory with verbose output
+      cd /opt/render/project/src/backend && \
+      echo "Installing Python packages..." && \
+      pip3 list && \
+      echo "Starting pip install..." && \
+      sudo pip3 install --no-cache-dir -r requirements.txt -v && \
+      echo "Installed packages:" && \
+      pip3 list
     startCommand: cd backend && npm start
     envVars:
       - key: NODE_ENV
@@ -14,7 +28,9 @@ services:
       - key: PORT
         value: 8080
       - key: PYTHONPATH
-        value: /opt/render/project/src/backend
+        value: /opt/render/project/src/backend/src/services
+      - key: PYTHONUNBUFFERED
+        value: "1"
 
   # Frontend static site
   - type: web
