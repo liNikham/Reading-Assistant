@@ -1,35 +1,28 @@
 const OCRService = require('../services/ocrService');
-const fs = require('fs');
+const path = require('path');
 
 exports.processImage = async (req, res) => {
-   console.log("in process image");
   try {
     if (!req.file) {
-      return res.status(400).json({ error: 'No image file provided' });
+      return res.status(400).json({
+        success: false,
+        error: 'No image file provided'
+      });
     }
 
-    // Set a longer timeout for the request
-    req.setTimeout(300000); // 5 minutes
+    console.log('Processing image:', req.file.path);
+    const result = await OCRService.performOCR(req.file.path);
 
-    // Perform OCR
-    const words = await OCRService.performOCR(req.file.path);
-
-    // Send response
     res.json({
       success: true,
-      data: words
+      data: result
     });
 
   } catch (error) {
-    console.error('OCR Processing Error:', error);
+    console.error('Error in processImage:', error);
     res.status(500).json({
       success: false,
       error: error.message
     });
-  } finally {
-    // Clean up the uploaded file
-    if (req.file && req.file.path) {
-      fs.unlinkSync(req.file.path);
-    }
   }
 }; 

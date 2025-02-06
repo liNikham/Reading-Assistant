@@ -1,57 +1,45 @@
-const { spawn } = require('child_process');
+const { createWorker } = require('tesseract.js');
 const path = require('path');
 
 class OCRService {
+  constructor() {
+    this.worker = null;
+  }
+
+  async initWorker() {
+    if (!this.worker) {
+      this.worker = await createWorker();
+      await this.worker.loadLanguage('eng');
+      await this.worker.initialize('eng');
+    }
+    return this.worker;
+  }
+
   async performOCR(imagePath) {
-    return new Promise((resolve, reject) => {
-      const pythonScriptPath = path.join(__dirname, 'ocr_service.py');
-      const pythonProcess = spawn('python3', [pythonScriptPath, imagePath], {
-        // Increase the max buffer size
-        maxBuffer: 1024 * 1024 * 100, // 100MB
-        timeout: 300000 // 5 minutes
-      });
+    try {
+      const worker = await this.initWorker();
+      console.log('Processing image:', imagePath);
       
-      let outputData = '';
-      let errorData = '';
+      const result = await worker.recognize(imagePath);
+      console.log('OCR completed');
 
-      // Handle standard output (JSON result)
-      pythonProcess.stdout.on('data', (data) => {
-        outputData += data.toString();
-      });
+      // Convert Tesseract result to your existing format
+      const words = result.data.words.map(word => ({
+        text: word.text,
+        confidence: word.confidence,
+        bbox: [
+          [word.bbox.x0, word.bbox.y0],
+          [word.bbox.x1, word.bbox.y0],
+          [word.bbox.x1, word.bbox.y1],
+          [word.bbox.x0, word.bbox.y1]
+        ]
+      }));
 
-      // Handle progress messages
-      pythonProcess.stderr.on('data', (data) => {
-        errorData += data.toString();
-        console.log('OCR Progress:', data.toString());
-      });
-
-      pythonProcess.on('close', (code) => {
-        if (code !== 0) {
-          console.error('Process exited with code:', code);
-          console.error('Error output:', errorData);
-          reject(new Error(`OCR process failed: ${errorData}`));
-          return;
-        }
-
-        try {
-          // Only try to parse the actual output data
-          const result = JSON.parse(outputData);
-          if (result.success) {
-            resolve(result.data);
-          } else {
-            reject(new Error(result.error || 'Unknown OCR error'));
-          }
-        } catch (error) {
-          reject(new Error(`Failed to parse OCR result: ${error.message}\nOutput: ${outputData}\nError: ${errorData}`));
-        }
-      });
-
-      // Handle process errors
-      pythonProcess.on('error', (error) => {
-        console.error('Process error:', error);
-        reject(new Error(`Failed to start OCR process: ${error.message}`));
-      });
-    });
+      return words;
+    } catch (error) {
+      console.error('OCR Error:', error);
+      throw error;
+    }
   }
 }
 
