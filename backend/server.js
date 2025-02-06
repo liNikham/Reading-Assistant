@@ -27,18 +27,17 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-// Updated CORS configuration
+// Allow all origins
 app.use(cors({
-  origin: [
-    process.env.FRONTEND_URL,
-    'http://localhost:3000',
-    'http://localhost:5173'
-  ],
+  origin: '*',
   methods: ['GET', 'POST', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 app.use(express.json());
+
+// Add a pre-flight route for OPTIONS requests
+app.options('*', cors());
 
 app.get("/", (req, res) => {
   res.send("Backend is running!");
