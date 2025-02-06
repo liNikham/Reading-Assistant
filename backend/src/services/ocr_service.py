@@ -3,11 +3,15 @@ import json
 import easyocr
 import numpy as np
 from PIL import Image
+import os
 
 def process_image(image_path):
     try:
         print("Initializing EasyOCR...", file=sys.stderr)
-        reader = easyocr.Reader(['en'], model_storage_directory='/app/models')
+        model_dir = '/app/models'
+        reader = easyocr.Reader(['en'], 
+                              model_storage_directory=model_dir,
+                              download_enabled=False)  # Prevent downloads during runtime
         
         print("Loading image...", file=sys.stderr)
         image = Image.open(image_path)

@@ -26,23 +26,27 @@ COPY . .
 RUN python3 -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
+# Create persistent directories
+RUN mkdir -p /app/models /app/uploads \
+    && chmod -R 777 /app/models /app/uploads
+
 # Install Python dependencies in virtual environment
 COPY requirements.txt .
 RUN . /opt/venv/bin/activate && pip3 install --no-cache-dir -r requirements.txt
 
-# Create directories and set permissions
-RUN mkdir -p /app/models /app/uploads \
-    && chmod -R 777 /app/models /app/uploads
-
 # Pre-download EasyOCR models
 COPY download_models.py .
 ENV PYTHONPATH=/app/src/services
+ENV PYTHONUNBUFFERED=1
 RUN python3 download_models.py
+
+# Create a volume for models
+VOLUME ["/app/models"]
 
 # Set environment variables
 ENV NODE_ENV=production
 ENV PORT=8080
-ENV PYTHONUNBUFFERED=1
+ENV MODEL_PATH=/app/models
 
 # Expose the port
 EXPOSE 8080
