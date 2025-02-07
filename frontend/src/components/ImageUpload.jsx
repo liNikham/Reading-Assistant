@@ -88,37 +88,41 @@ const ImageUpload = ({ setFile: setParentFile, setCoordinates }) => {
   };
 
   const handleWordClick = async (word, index) => {
-    // Remove any existing highlights
-    const highlightedWords = document.querySelectorAll('.highlighted');
-    highlightedWords.forEach(el => el.classList.remove('highlighted'));
-    
-    // Add highlight to clicked word using index for unique identification
-    const wordElement = document.querySelector(`[data-word-index="${index}"]`);
-    if (wordElement) {
-      wordElement.classList.add('highlighted');
-    }
+  const highlightedWords = document.querySelectorAll('.highlighted');
+  highlightedWords.forEach(el => el.classList.remove('highlighted'));
 
-    if ('speechSynthesis' in window) {
-      // Cancel any ongoing speech
-      window.speechSynthesis.cancel();
+  const wordElement = document.querySelector(`[data-word-index="${index}"]`);
+  if (wordElement) {
+    wordElement.classList.add('highlighted');
+  }
 
-      const speech = new SpeechSynthesisUtterance(word);
-      speech.lang = 'en-US';
-      
-      // Adjust speech rate (0.1 to 10, 1 is normal speed, lower is slower)
-      speech.rate = 0.5; // You can adjust this value
-      
-      // Adjust pitch (0 to 2, 1 is normal)
-      speech.pitch = 1;
-      
-      // Adjust volume (0 to 1)
-      speech.volume = 1;
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
 
-      window.speechSynthesis.speak(speech);
+    const speech = new SpeechSynthesisUtterance(word);
+
+    // Detect language (simple check)
+    const isHindi = /[\u0900-\u097F]/.test(word);
+    const isMarathi = /[\u0900-\u097F]/.test(word); // Marathi shares script with Hindi
+
+    if (isHindi) {
+      speech.lang = 'hi-IN'; // Hindi
+    } else if (isMarathi) {
+      speech.lang = 'mr-IN'; // Marathi
     } else {
-      console.log('Speech synthesis not supported');
+      speech.lang = 'en-US'; // Default to English
     }
-  };
+
+    speech.rate = 0.8; 
+    speech.pitch = 1;
+    speech.volume = 1;
+
+    window.speechSynthesis.speak(speech);
+  } else {
+    console.log('Speech synthesis not supported');
+  }
+};
+
 
   const displayExtractedText = (words) => {
     return words.map((word, index) => (

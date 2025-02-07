@@ -1,5 +1,4 @@
 const { createWorker } = require('tesseract.js');
-const path = require('path');
 
 class OCRService {
   constructor() {
@@ -9,8 +8,8 @@ class OCRService {
   async initWorker() {
     if (!this.worker) {
       this.worker = await createWorker();
-      await this.worker.loadLanguage('eng');
-      await this.worker.initialize('eng');
+      await this.worker.loadLanguage('eng+hin+mar'); // Load English, Hindi, and Marathi
+      await this.worker.initialize('eng+hin+mar'); // Initialize with multiple languages
     }
     return this.worker;
   }
@@ -43,4 +42,4 @@ class OCRService {
   }
 }
 
-module.exports = new OCRService(); 
+module.exports = new OCRService();

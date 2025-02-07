@@ -63,9 +63,9 @@ const App = () => {
                   animate={{ opacity: 1 }}
                   className="text-2xl font-semibold text-gray-800 mb-6 text-center"
                 >
-                  Detected Text Preview
+                  
                 </motion.h2>
-                <ImageWithHighlight file={file} coordinates={coordinates} />
+                {/* <ImageWithHighlight file={file} coordinates={coordinates} /> */}
               </motion.div>
             )}
           </AnimatePresence>
