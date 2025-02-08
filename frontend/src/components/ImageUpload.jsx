@@ -138,11 +138,12 @@ const ImageUpload = ({ setFile: setParentFile, setCoordinates }) => {
   const styles = `
     .word {
       display: inline-block;
-      margin: 0 4px;
+      margin: 2px 4px;
       padding: 2px 4px;
       cursor: pointer;
       border-radius: 4px;
       transition: all 0.2s ease;
+      font-size: clamp(14px, 3vw, 16px);
     }
     .word:hover {
       color: #6d28d9;
@@ -153,10 +154,16 @@ const ImageUpload = ({ setFile: setParentFile, setCoordinates }) => {
       background-color: #ddd6fe;
       font-weight: 500;
     }
+    @media (max-width: 640px) {
+      .word {
+        margin: 1px 2px;
+        padding: 1px 2px;
+      }
+    }
   `;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 p-2 sm:p-4 md:p-6">
       <style>{styles}</style>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -166,12 +173,12 @@ const ImageUpload = ({ setFile: setParentFile, setCoordinates }) => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-6 p-6 bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl"
+          className="mb-4 sm:mb-6 p-3 sm:p-4 md:p-6 bg-white/80 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-xl"
         >
-          <h3 className="text-xl font-bold bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent mb-4">
+          <h3 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent mb-3 sm:mb-4 text-center">
             Select Document Language
           </h3>
-          <div className="flex gap-4 justify-center">
+          <div className="flex flex-wrap gap-2 sm:gap-4 justify-center">
             {[
               { id: 'eng', label: 'English' },
               { id: 'hin', label: 'Hindi' },
@@ -185,7 +192,7 @@ const ImageUpload = ({ setFile: setParentFile, setCoordinates }) => {
                   setParentFile(null);
                   setExtractedWords([]);
                 }}
-                className={`px-6 py-3 rounded-xl transition-all duration-300 ${
+                className={`px-3 sm:px-6 py-2 sm:py-3 rounded-lg sm:rounded-xl text-sm sm:text-base transition-all duration-300 ${
                   selectedLanguage === lang.id
                     ? 'bg-gradient-to-r from-violet-500 to-purple-600 text-white shadow-lg scale-105'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -199,7 +206,7 @@ const ImageUpload = ({ setFile: setParentFile, setCoordinates }) => {
 
         {selectedLanguage ? (
           <div
-            className={`relative border-2 border-dashed rounded-2xl p-12 backdrop-blur-sm 
+            className={`relative border-2 border-dashed rounded-xl sm:rounded-2xl p-4 sm:p-8 md:p-12 backdrop-blur-sm 
               transition-all duration-500 ease-out transform hover:scale-[1.02]
               ${isDragging
                 ? 'border-violet-500 bg-violet-50/80'
@@ -218,21 +225,21 @@ const ImageUpload = ({ setFile: setParentFile, setCoordinates }) => {
               className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
             />
 
-            <div className="flex flex-col items-center justify-center space-y-6">
+            <div className="flex flex-col items-center justify-center space-y-4 sm:space-y-6">
               <motion.div
                 whileHover={{ scale: 1.1, rotate: 180 }}
                 whileTap={{ scale: 0.95 }}
                 transition={{ type: "spring", stiffness: 300 }}
-                className="p-6 rounded-full bg-gradient-to-tr from-violet-500 to-purple-600 shadow-lg"
+                className="p-4 sm:p-6 rounded-full bg-gradient-to-tr from-violet-500 to-purple-600 shadow-lg"
               >
-                <FiUploadCloud className="w-10 h-10 text-white" />
+                <FiUploadCloud className="w-6 h-6 sm:w-10 sm:h-10 text-white" />
               </motion.div>
 
-              <div className="text-center space-y-2">
-                <h3 className="text-xl font-bold bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent">
+              <div className="text-center space-y-1 sm:space-y-2">
+                <h3 className="text-base sm:text-xl font-bold bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent">
                   Drag & Drop or Click to Upload
                 </h3>
-                <p className="text-sm text-gray-500">
+                <p className="text-xs sm:text-sm text-gray-500">
                   Supports JPG, PNG, GIF (Max 10MB)
                 </p>
               </div>
@@ -242,7 +249,7 @@ const ImageUpload = ({ setFile: setParentFile, setCoordinates }) => {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="text-center text-gray-500 p-6"
+            className="text-center text-gray-500 p-4 sm:p-6 text-sm sm:text-base"
           >
             Please select a language before uploading an image
           </motion.div>
@@ -254,13 +261,13 @@ const ImageUpload = ({ setFile: setParentFile, setCoordinates }) => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="mt-8 rounded-2xl overflow-hidden bg-white/80 backdrop-blur-sm shadow-xl"
+              className="mt-4 sm:mt-8 rounded-xl sm:rounded-2xl overflow-hidden bg-white/80 backdrop-blur-sm shadow-xl"
             >
               <div className="relative group">
                 <img
                   src={URL.createObjectURL(localFile)}
                   alt="Preview"
-                  className="w-full h-[400px] object-contain bg-gradient-to-br from-gray-50 to-gray-100"
+                  className="w-full h-[200px] sm:h-[300px] md:h-[400px] object-contain bg-gradient-to-br from-gray-50 to-gray-100"
                 />
                 {isProcessing && (
                   <div className="absolute inset-0 backdrop-blur-sm bg-black/30 flex items-center justify-center">
@@ -299,12 +306,12 @@ const ImageUpload = ({ setFile: setParentFile, setCoordinates }) => {
                   </button>
                 </motion.div>
               </div>
-              <div className="p-4 border-t border-gray-100">
-                <div className="flex items-center space-x-3">
-                  <div className="p-2 bg-violet-100 rounded-lg">
-                    <FiImage className="text-violet-500" />
+              <div className="p-3 sm:p-4 border-t border-gray-100">
+                <div className="flex items-center space-x-2 sm:space-x-3">
+                  <div className="p-1.5 sm:p-2 bg-violet-100 rounded-lg">
+                    <FiImage className="text-violet-500 w-4 h-4 sm:w-5 sm:h-5" />
                   </div>
-                  <span className="text-sm text-gray-600 font-medium truncate">
+                  <span className="text-xs sm:text-sm text-gray-600 font-medium truncate">
                     {localFile.name}
                   </span>
                 </div>
@@ -317,12 +324,12 @@ const ImageUpload = ({ setFile: setParentFile, setCoordinates }) => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mt-6 p-6 bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl"
+            className="mt-4 sm:mt-6 p-3 sm:p-4 md:p-6 bg-white/80 backdrop-blur-sm rounded-xl sm:rounded-2xl shadow-xl"
           >
-            <h3 className="text-xl font-bold bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent mb-4">
+            <h3 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent mb-3 sm:mb-4">
               Extracted Text
             </h3>
-            <div className="text-gray-700 leading-relaxed">
+            <div className="text-gray-700 leading-relaxed text-sm sm:text-base">
               {displayExtractedText(extractedWords)}
             </div>
           </motion.div>
