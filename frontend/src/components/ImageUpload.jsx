@@ -5,6 +5,7 @@ import { FiUploadCloud, FiImage, FiSearch } from 'react-icons/fi';
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 const ImageUpload = ({ setFile: setParentFile, setCoordinates }) => {
+  const [selectedLanguage, setSelectedLanguage] = useState('');
   const [localFile, setLocalFile] = useState(null);
   const [extractedWords, setExtractedWords] = useState([]);
   const [isDragging, setIsDragging] = useState(false);
@@ -34,6 +35,7 @@ const ImageUpload = ({ setFile: setParentFile, setCoordinates }) => {
 
         const formData = new FormData();
         formData.append('image', selectedFile);
+        formData.append('language', selectedLanguage);
 
         const response = await fetch(`${API_URL}/api/ocr/process`, {
           method: 'POST',
@@ -88,41 +90,35 @@ const ImageUpload = ({ setFile: setParentFile, setCoordinates }) => {
   };
 
   const handleWordClick = async (word, index) => {
-  const highlightedWords = document.querySelectorAll('.highlighted');
-  highlightedWords.forEach(el => el.classList.remove('highlighted'));
+    const highlightedWords = document.querySelectorAll('.highlighted');
+    highlightedWords.forEach(el => el.classList.remove('highlighted'));
 
-  const wordElement = document.querySelector(`[data-word-index="${index}"]`);
-  if (wordElement) {
-    wordElement.classList.add('highlighted');
-  }
+    const wordElement = document.querySelector(`[data-word-index="${index}"]`);
+    if (wordElement) {
+      wordElement.classList.add('highlighted');
+    }
 
-  if ('speechSynthesis' in window) {
-    window.speechSynthesis.cancel();
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      const speech = new SpeechSynthesisUtterance(word);
 
-    const speech = new SpeechSynthesisUtterance(word);
-
-    // Detect language (simple check)
+        // Detect language (simple check)
     const isHindi = /[\u0900-\u097F]/.test(word);
     const isMarathi = /[\u0900-\u097F]/.test(word); // Marathi shares script with Hindi
-
     if (isHindi) {
       speech.lang = 'hi-IN'; // Hindi
     } else if (isMarathi) {
       speech.lang = 'mr-IN'; // Marathi
-    } else {
-      speech.lang = 'en-US'; // Default to English
+    } else {  speech.lang = 'en-US'; // Default to English
     }
 
-    speech.rate = 0.8; 
-    speech.pitch = 1;
-    speech.volume = 1;
+      speech.rate = 0.6;
+      speech.pitch = 1;
+      speech.volume = 1;
 
-    window.speechSynthesis.speak(speech);
-  } else {
-    console.log('Speech synthesis not supported');
-  }
-};
-
+      window.speechSynthesis.speak(speech);
+    }
+  };
 
   const displayExtractedText = (words) => {
     return words.map((word, index) => (
@@ -167,46 +163,90 @@ const ImageUpload = ({ setFile: setParentFile, setCoordinates }) => {
         animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-3xl mx-auto"
       >
-        <div
-          className={`relative border-2 border-dashed rounded-2xl p-12 backdrop-blur-sm 
-            transition-all duration-500 ease-out transform hover:scale-[1.02]
-            ${isDragging
-              ? 'border-violet-500 bg-violet-50/80'
-              : 'border-gray-300/50 hover:border-violet-400 bg-white/70'
-            }
-            shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:shadow-[0_8px_40px_rgb(0,0,0,0.16)]`}
-          onDragOver={handleDrag}
-          onDragEnter={handleDragIn}
-          onDragLeave={handleDragOut}
-          onDrop={handleDrop}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-6 p-6 bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl"
         >
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleImageChange}
-            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-          />
+          <h3 className="text-xl font-bold bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent mb-4">
+            Select Document Language
+          </h3>
+          <div className="flex gap-4 justify-center">
+            {[
+              { id: 'eng', label: 'English' },
+              { id: 'hin', label: 'Hindi' },
+              { id: 'mar', label: 'Marathi' }
+            ].map((lang) => (
+              <button
+                key={lang.id}
+                onClick={() => {
+                  setSelectedLanguage(lang.id);
+                  setLocalFile(null);
+                  setParentFile(null);
+                  setExtractedWords([]);
+                }}
+                className={`px-6 py-3 rounded-xl transition-all duration-300 ${
+                  selectedLanguage === lang.id
+                    ? 'bg-gradient-to-r from-violet-500 to-purple-600 text-white shadow-lg scale-105'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                {lang.label}
+              </button>
+            ))}
+          </div>
+        </motion.div>
 
-          <div className="flex flex-col items-center justify-center space-y-6">
-            <motion.div
-              whileHover={{ scale: 1.1, rotate: 180 }}
-              whileTap={{ scale: 0.95 }}
-              transition={{ type: "spring", stiffness: 300 }}
-              className="p-6 rounded-full bg-gradient-to-tr from-violet-500 to-purple-600 shadow-lg"
-            >
-              <FiUploadCloud className="w-10 h-10 text-white" />
-            </motion.div>
+        {selectedLanguage ? (
+          <div
+            className={`relative border-2 border-dashed rounded-2xl p-12 backdrop-blur-sm 
+              transition-all duration-500 ease-out transform hover:scale-[1.02]
+              ${isDragging
+                ? 'border-violet-500 bg-violet-50/80'
+                : 'border-gray-300/50 hover:border-violet-400 bg-white/70'
+              }
+              shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:shadow-[0_8px_40px_rgb(0,0,0,0.16)]`}
+            onDragOver={handleDrag}
+            onDragEnter={handleDragIn}
+            onDragLeave={handleDragOut}
+            onDrop={handleDrop}
+          >
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+            />
 
-            <div className="text-center space-y-2">
-              <h3 className="text-xl font-bold bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent">
-                Drag & Drop or Click to Upload
-              </h3>
-              <p className="text-sm text-gray-500">
-                Supports JPG, PNG, GIF (Max 10MB)
-              </p>
+            <div className="flex flex-col items-center justify-center space-y-6">
+              <motion.div
+                whileHover={{ scale: 1.1, rotate: 180 }}
+                whileTap={{ scale: 0.95 }}
+                transition={{ type: "spring", stiffness: 300 }}
+                className="p-6 rounded-full bg-gradient-to-tr from-violet-500 to-purple-600 shadow-lg"
+              >
+                <FiUploadCloud className="w-10 h-10 text-white" />
+              </motion.div>
+
+              <div className="text-center space-y-2">
+                <h3 className="text-xl font-bold bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent">
+                  Drag & Drop or Click to Upload
+                </h3>
+                <p className="text-sm text-gray-500">
+                  Supports JPG, PNG, GIF (Max 10MB)
+                </p>
+              </div>
             </div>
           </div>
-        </div>
+        ) : (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-center text-gray-500 p-6"
+          >
+            Please select a language before uploading an image
+          </motion.div>
+        )}
 
         <AnimatePresence mode="wait">
           {localFile && (

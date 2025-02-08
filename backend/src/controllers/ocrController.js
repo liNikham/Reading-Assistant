@@ -10,8 +10,10 @@ exports.processImage = async (req, res) => {
       });
     }
 
+    const language = req.body.language || 'eng'; // Get language from request
+
     console.log('Processing image:', req.file.path);
-    const result = await OCRService.performOCR(req.file.path);
+    const result = await OCRService.performOCR(req.file.path, language);
 
     res.json({
       success: true,

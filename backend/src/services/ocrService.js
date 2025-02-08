@@ -2,27 +2,31 @@ const { createWorker } = require('tesseract.js');
 
 class OCRService {
   constructor() {
-    this.worker = null;
+    this.workers = {};
   }
 
-  async initWorker() {
-    if (!this.worker) {
-      this.worker = await createWorker();
-      await this.worker.loadLanguage('eng+hin+mar'); // Load English, Hindi, and Marathi
-      await this.worker.initialize('eng+hin+mar'); // Initialize with multiple languages
+  async initWorker(language) {
+    if (!this.workers[language]) {
+      const worker = await createWorker();
+      await worker.loadLanguage(language);
+      await worker.initialize(language);
+      this.workers[language] = worker;
     }
-    return this.worker;
+    return this.workers[language];
   }
 
-  async performOCR(imagePath) {
+  async performOCR(imagePath, language) {
     try {
-      const worker = await this.initWorker();
-      console.log('Processing image:', imagePath);
+      if (!['eng', 'hin', 'mar'].includes(language)) {
+        throw new Error('Invalid language. Use "eng", "hin", or "mar".');
+      }
+
+      const worker = await this.initWorker(language);
+      console.log(`Processing image in ${language}:`, imagePath);
       
       const result = await worker.recognize(imagePath);
       console.log('OCR completed');
 
-      // Convert Tesseract result to your existing format
       const words = result.data.words.map(word => ({
         text: word.text,
         confidence: word.confidence,
